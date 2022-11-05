@@ -44,8 +44,14 @@ const onInput = async (e) => {
             ${movie.Title}
             <p>${movie.Year}</p>
         `;
+    option.addEventListener('click', () => {
+      dropdown.classList.remove('is-active');
+      input.value = movie.Title;
+      onMovieSelect(movie);
+    })
     resultsWrapper.appendChild(option);
   }
+
 };
 
 input.addEventListener("input", debounce(onInput, 500));
@@ -55,3 +61,32 @@ document.addEventListener('click', (e) => {
     dropdown.classList.remove('is-active');
   }
 })
+
+onMovieSelect = async (movie) => {
+  const response = await axios.get("http://www.omdbapi.com/", {
+    params: {
+      apikey: "fb656db",
+      i: movie.imdbID
+    }
+  });
+  document.querySelector('#summary').innerHTML = movieBlueprint(response.data);  
+}
+
+const movieBlueprint = (movieSummary) => {
+  return `
+    <article class="media">
+      <figure class="media-left">
+        <p class="image">
+          <img src="${movieSummary.Poster}" />
+        </p>
+      </figure>
+      <div class="media-content">
+        <div class="content">
+          <h1>${movieSummary.Title}</h1>
+          <h4>${movieSummary.Genre}</h4>
+          <p>${movieSummary.Plot}</p>
+        </div>
+      </div>
+    </article>
+  `
+}
