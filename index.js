@@ -1,66 +1,35 @@
 const fetchData = async (searchTerm) => {
-  const response = await axios.get("http://www.omdbapi.com/", {
-    params: {
-      apikey: "fb656db",
-      s: searchTerm,
-    },
-  });
-
-  if (response.data.Error) {
-    return [];
-  }
-  return response.data.Search;
+  
 };
 
-const root = document.querySelector(".autocomplete");
-root.innerHTML = `<label><b>Search Movie</b></label>
-                  <input class="input" />
-                  <div class="dropdown">
-                        <div class="dropdown-menu">
-                            <div class="dropdown-content results"></div>
-                        </div>
-                  </div>
-`;
-const input = document.querySelector("input");
-const dropdown = document.querySelector(".dropdown");
-const resultsWrapper = document.querySelector(".results");
-
-const onInput = async (e) => {
-  const movies = await fetchData(e.target.value);
-  if (!movies.length) {
-    dropdown.classList.remove('is-active');
-    return;
-  }
-
-  resultsWrapper.innerHTML = "";
-  dropdown.classList.add("is-active");
-  for (let movie of movies) {
-    const option = document.createElement("a");
+createAutoComplete({
+  root: document.querySelector('.autocomplete'), 
+  renderOption(movie) {
     const imgSRC = movie.Poster === "N/A" ? "" : movie.Poster;
-
-    option.classList.add("dropdown-item");
-    option.innerHTML = `
-            <img src="${imgSRC}" />
-            ${movie.Title}
-            <p>${movie.Year}</p>
-        `;
-    option.addEventListener('click', () => {
-      dropdown.classList.remove('is-active');
-      input.value = movie.Title;
-      onMovieSelect(movie);
+    return `<img src="${imgSRC}" />
+    ${movie.Title} (${movie.Year})`;
+  },
+  onOptionSelect(movie) {
+    onMovieSelect(movie);
+  },
+  inputValue(movie) {
+    return movie.Title;
+  },
+  async fetchData(searchTerm) {
+    const response = await axios.get('http://www.omdbapi.com/', {
+      params: {
+        apikey: "fb656db",
+        s: searchTerm 
+      }
     })
-    resultsWrapper.appendChild(option);
+
+    if (response.data.Error) {
+      return []
+    } 
+    return response.data.Search;
   }
+});
 
-};
-
-input.addEventListener("input", debounce(onInput, 500));
-
-document.addEventListener('click', (e) => {
-  if (!root.contains(e.target)) {
-    dropdown.classList.remove('is-active');
-  }
-})
 
 onMovieSelect = async (movie) => {
   const response = await axios.get("http://www.omdbapi.com/", {
@@ -87,6 +56,26 @@ const movieBlueprint = (movieSummary) => {
           <p>${movieSummary.Plot}</p>
         </div>
       </div>
+    </article>
+    <article class="notification is-primary">
+      <p class="title">${movieSummary.Awards}</p>
+      <p class="subtitle">Awards</p>
+    </article>
+    <article class="notification is-primary">
+      <p class="title">${movieSummary.BoxOffice}</p>
+      <p class="subtitle">Box Office</p>
+    </article>
+    <article class="notification is-primary">
+      <p class="title">${movieSummary.Metascore}</p>
+      <p class="subtitle">Metascore</p>
+    </article>
+    <article class="notification is-primary">
+      <p class="title">${movieSummary.imdbRating}</p>
+      <p class="subtitle">IMDB Rating</p>
+    </article>
+    <article class="notification is-primary">
+      <p class="title">${movieSummary.imdbVotes}</p>
+      <p class="subtitle">IMDB Votes</p>
     </article>
   `
 }
