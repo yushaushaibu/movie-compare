@@ -4,9 +4,6 @@ const autocompleteConfig = {
     return `<img src="${imgSRC}" />
               ${movie.Title} (${movie.Year})`;
   },
-  onOptionSelect(movie) {
-    onMovieSelect(movie);
-  },
   inputValue(movie) {
     return movie.Title;
   },
@@ -26,22 +23,30 @@ const autocompleteConfig = {
 
 createAutocomplete({
   ...autocompleteConfig,
-  root: document.querySelector("#left-autocomplete")
+  root: document.querySelector("#left-autocomplete"),
+  onOptionSelect(movie) {
+    document.querySelector('.tutorial').classList.add('is-hidden');
+    onMovieSelect(movie, document.querySelector('#left-movieSummary'));
+  }
 });
 
 createAutocomplete({
   ...autocompleteConfig,
-  root: document.querySelector('#right-autocomplete')
+  root: document.querySelector('#right-autocomplete'),
+  onOptionSelect(movie) {
+    document.querySelector('.tutorial').classList.add('is-hidden');
+    onMovieSelect(movie, document.querySelector('#right-movieSummary'));
+  }
 });
 
-onMovieSelect = async (movie) => {
+onMovieSelect = async (movie, movieSummaryElement) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "fb656db",
       i: movie.imdbID,
     },
   });
-  document.querySelector("#summary").innerHTML = movieBlueprint(response.data);
+  movieSummaryElement.innerHTML = movieBlueprint(response.data);
 };
 
 const movieBlueprint = (movieSummary) => {
