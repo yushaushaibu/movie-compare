@@ -1,39 +1,47 @@
-createAutocomplete({
- root: document.querySelector('.autocomplete'),
- renderOption(movie) {
-  const imgSRC = movie.Poster === "N/A" ? "" : movie.Poster;
+const autocompleteConfig = {
+  renderOption(movie) {
+    const imgSRC = movie.Poster === "N/A" ? "" : movie.Poster;
     return `<img src="${imgSRC}" />
-            ${movie.Title} (${movie.Year})`;
- },
- onOptionSelect(movie) {
-  onMovieSelect(movie);
- },
- inputValue(movie) {
-  return movie.Title;
- },
- async fetchData(searchTerm) {
-  const response = await axios.get('http://www.omdbapi.com/', {
-    params: {
-      apikey: "fb656db",
-      s: searchTerm
+              ${movie.Title} (${movie.Year})`;
+  },
+  onOptionSelect(movie) {
+    onMovieSelect(movie);
+  },
+  inputValue(movie) {
+    return movie.Title;
+  },
+  async fetchData(searchTerm) {
+    const response = await axios.get("http://www.omdbapi.com/", {
+      params: {
+        apikey: "fb656db",
+        s: searchTerm,
+      },
+    });
+    if (response.data.Error) {
+      return [];
     }
-  })
-  if (response.data.Error) {
-    return []
-  }
-  return response.data.Search;
- }
+    return response.data.Search;
+  },
+};
+
+createAutocomplete({
+  ...autocompleteConfig,
+  root: document.querySelector("#left-autocomplete")
 });
 
+createAutocomplete({
+  ...autocompleteConfig,
+  root: document.querySelector('#right-autocomplete')
+});
 
 onMovieSelect = async (movie) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "fb656db",
-      i: movie.imdbID
-    }
+      i: movie.imdbID,
+    },
   });
-  document.querySelector('#summary').innerHTML = movieBlueprint(response.data);
+  document.querySelector("#summary").innerHTML = movieBlueprint(response.data);
 };
 
 const movieBlueprint = (movieSummary) => {
