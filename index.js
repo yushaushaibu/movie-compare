@@ -25,21 +25,23 @@ createAutocomplete({
   ...autocompleteConfig,
   root: document.querySelector("#left-autocomplete"),
   onOptionSelect(movie) {
-    document.querySelector('.tutorial').classList.add('is-hidden');
-    onMovieSelect(movie, document.querySelector('#left-movieSummary'));
-  }
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, document.querySelector("#left-movieSummary"), 'left');
+  },
 });
 
 createAutocomplete({
   ...autocompleteConfig,
-  root: document.querySelector('#right-autocomplete'),
+  root: document.querySelector("#right-autocomplete"),
   onOptionSelect(movie) {
-    document.querySelector('.tutorial').classList.add('is-hidden');
-    onMovieSelect(movie, document.querySelector('#right-movieSummary'));
-  }
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, document.querySelector("#right-movieSummary"), 'right');
+  },
 });
 
-onMovieSelect = async (movie, movieSummaryElement) => {
+let leftMovie;
+let rightMovie;
+onMovieSelect = async (movie, movieSummaryElement, side) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "fb656db",
@@ -47,9 +49,28 @@ onMovieSelect = async (movie, movieSummaryElement) => {
     },
   });
   movieSummaryElement.innerHTML = movieBlueprint(response.data);
+
+  if (side === 'left') {
+    leftMovie = response.data;
+  } else {
+    rightMovie = response.data;
+  }
+
+  if (leftMovie && rightMovie) {
+    runComparison();
+  }
 };
 
+const runComparison = () => {
+  console.log('RUNNING COMPARISON')
+}
+
 const movieBlueprint = (movieSummary) => {
+  const revenue = parseInt(movieSummary.BoxOffice.replace(/\$/g, '').replace(/,/g, ''));
+  const metascore = parseInt(movieSummary.Metascore);
+  const imdbRating = parseFloat(movieSummary.imdbRating);
+  const imdbVotes = parseInt(movieSummary.imdbVotes.replace(/,/g, ''));
+
   return `
     <article class="media">
       <figure class="media-left">
