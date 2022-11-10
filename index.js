@@ -71,17 +71,16 @@ const movieBlueprint = (movieSummary) => {
   const imdbRating = parseFloat(movieSummary.imdbRating);
   const imdbVotes = parseInt(movieSummary.imdbVotes.replace(/,/g, ''));
 
-  let count = 0;
-  movieSummary.Awards.split(' ').forEach((word) => {
+  const awards = movieSummary.Awards.split(' ').reduce((prev, word) => {
     const value = parseInt(word);
     
     if (isNaN(value)) {
-      return;
+      return prev;
     } else {
-      count = count + value;
+      return prev + value;
     }
-  });
-  console.log(count);
+  }, 0);
+  
 
 
   return `
@@ -99,23 +98,23 @@ const movieBlueprint = (movieSummary) => {
         </div>
       </div>
     </article>
-    <article class="notification is-primary">
+    <article data-value=${awards} class="notification is-primary">
       <p class="title">${movieSummary.Awards}</p>
       <p class="subtitle">Awards</p>
     </article>
-    <article class="notification is-primary">
+    <article data-value=${revenue} class="notification is-primary">
       <p class="title">${movieSummary.BoxOffice}</p>
       <p class="subtitle">Box Office</p>
     </article>
-    <article class="notification is-primary">
+    <article data-value=${metascore} class="notification is-primary">
       <p class="title">${movieSummary.Metascore}</p>
       <p class="subtitle">Metascore</p>
     </article>
-    <article class="notification is-primary">
+    <article data-value=${imdbRating} class="notification is-primary">
       <p class="title">${movieSummary.imdbRating}</p>
       <p class="subtitle">IMDB Rating</p>
     </article>
-    <article class="notification is-primary">
+    <article data-value=${imdbVotes} class="notification is-primary">
       <p class="title">${movieSummary.imdbVotes}</p>
       <p class="subtitle">IMDB Votes</p>
     </article>
