@@ -71,6 +71,19 @@ const movieBlueprint = (movieSummary) => {
   const imdbRating = parseFloat(movieSummary.imdbRating);
   const imdbVotes = parseInt(movieSummary.imdbVotes.replace(/,/g, ''));
 
+  let count = 0;
+  movieSummary.Awards.split(' ').forEach((word) => {
+    const value = parseInt(word);
+    
+    if (isNaN(value)) {
+      return;
+    } else {
+      count = count + value;
+    }
+  });
+  console.log(count);
+
+
   return `
     <article class="media">
       <figure class="media-left">
