@@ -26,7 +26,7 @@ createAutocomplete({
   root: document.querySelector("#left-autocomplete"),
   onOptionSelect(movie) {
     document.querySelector(".tutorial").classList.add("is-hidden");
-    onMovieSelect(movie, document.querySelector("#left-movieSummary"), 'left');
+    onMovieSelect(movie, document.querySelector("#left-movieSummary"), "left");
   },
 });
 
@@ -35,7 +35,11 @@ createAutocomplete({
   root: document.querySelector("#right-autocomplete"),
   onOptionSelect(movie) {
     document.querySelector(".tutorial").classList.add("is-hidden");
-    onMovieSelect(movie, document.querySelector("#right-movieSummary"), 'right');
+    onMovieSelect(
+      movie,
+      document.querySelector("#right-movieSummary"),
+      "right"
+    );
   },
 });
 
@@ -50,7 +54,7 @@ onMovieSelect = async (movie, movieSummaryElement, side) => {
   });
   movieSummaryElement.innerHTML = movieBlueprint(response.data);
 
-  if (side === 'left') {
+  if (side === "left") {
     leftMovie = response.data;
   } else {
     rightMovie = response.data;
@@ -62,26 +66,46 @@ onMovieSelect = async (movie, movieSummaryElement, side) => {
 };
 
 const runComparison = () => {
-  console.log('RUNNING COMPARISON')
-}
+  const leftSideStats = document.querySelectorAll(
+    "#left-movieSummary .notification"
+  );
+  const rightSideStats = document.querySelectorAll(
+    "#right-movieSummary .notification"
+  );
+
+  leftSideStats.forEach((leftStat, index) => {
+    const rightStat = rightSideStats[index];
+
+    const leftSideValue = parseInt(leftStat.dataset.value);
+    const rightSideValue = parseInt(rightStat.dataset.value);
+
+    if (rightSideValue > leftSideValue) {
+      leftStat.classList.remove("primary");
+      leftStat.classList.add("is-warning");
+    } else {
+      rightStat.classList.remove("is-primary");
+      rightStat.classList.add("is-warning");
+    }
+  });
+};
 
 const movieBlueprint = (movieSummary) => {
-  const revenue = parseInt(movieSummary.BoxOffice.replace(/\$/g, '').replace(/,/g, ''));
+  const revenue = parseInt(
+    movieSummary.BoxOffice.replace(/\$/g, "").replace(/,/g, "")
+  );
   const metascore = parseInt(movieSummary.Metascore);
   const imdbRating = parseFloat(movieSummary.imdbRating);
-  const imdbVotes = parseInt(movieSummary.imdbVotes.replace(/,/g, ''));
+  const imdbVotes = parseInt(movieSummary.imdbVotes.replace(/,/g, ""));
 
-  const awards = movieSummary.Awards.split(' ').reduce((prev, word) => {
+  const awards = movieSummary.Awards.split(" ").reduce((prev, word) => {
     const value = parseInt(word);
-    
+
     if (isNaN(value)) {
       return prev;
     } else {
       return prev + value;
     }
   }, 0);
-  
-
 
   return `
     <article class="media">
